@@ -15,7 +15,7 @@ import { Button } from "@components/Button";
 export function Players() {
 
     const [team, setTeam] = useState('Time A');
-    const [players, setPlayers] = useState([])
+    const [players, setPlayers] = useState(['Guib', 'Silva'])
 
 
     return (
