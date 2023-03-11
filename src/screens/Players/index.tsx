@@ -11,7 +11,7 @@ import { FlatList, TextInput } from "react-native";
 import { PlayerCard } from "@components/PlayerCard";
 import { ListEmpty } from "@components/ListEmpty";
 import { Button } from "@components/Button";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import {Alert} from 'react-native'
 import { AppError } from "@utils/AppError";
 import { playerAddByGroup } from "@storage/player/playerAddByGroup";
@@ -19,6 +19,7 @@ import { playersGetByGroup } from "@storage/player/playersGetByGroup";
 import { playersGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
 import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
 import { playerRemoveByGroup } from "@storage/player/playerRemoveByGroup";
+import { groupRemoveByName } from "@storage/group/groupRemoveByName";
 
 type RouteParams = {
     group: string;
@@ -30,6 +31,7 @@ export function Players() {
     const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
     const routes = useRoute();
+    const navigation = useNavigation()
     const {group} = routes.params as RouteParams
 
     const newPlayerNameInputRef = useRef<TextInput>(null)
@@ -80,6 +82,27 @@ export function Players() {
             console.log(error);
             Alert.alert('Remover pessoa', 'Não foi possível remover essa pessoa')
         }
+    }
+
+    async function groupRemove() {
+        try{
+            await groupRemoveByName(group)
+            navigation.navigate('groups')
+        }catch(error){
+            console.log(error)
+            Alert.alert('Remover grupo', 'Não foi possível remover o grupo.')
+        }
+    }
+
+    async function handleGroupRemove(){
+        Alert.alert(
+            'Remover',
+            'Deseja remover este grupo?',
+            [
+                {text: 'Não', style:'cancel'},
+                {text: 'Sim', onPress: ()=> groupRemove()}
+            ]
+        )
     }
 
     useEffect(() => {
@@ -146,7 +169,7 @@ export function Players() {
                 ]}
             />
 
-            <Button type="SECONDARY" title="Remover Turma"/>
+            <Button onPress={handleGroupRemove} type="SECONDARY" title="Remover Turma"/>
         </Container>
     )
 }
